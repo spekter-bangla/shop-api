@@ -10,6 +10,7 @@
   - [ ] New Password Setup When Forgot Password
   - [ ] Change Password
   - [ ] Logout
+  - [ ] Role Base Authorization
   - Social Authentication
     - [ ] Facebook
     - [ ] Google
