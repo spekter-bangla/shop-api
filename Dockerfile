@@ -1,6 +1,6 @@
 FROM node:14
 WORKDIR /app
-COPY package*.json .
+COPY package*.json ./
 
 ARG NODE_ENV
 RUN if [ "$NODE_ENV" = "production" ]; \
