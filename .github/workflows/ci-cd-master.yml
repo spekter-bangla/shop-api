@@ -5,9 +5,9 @@ name: Running Test then Deploy to Heroku
 
 on:
   push:
-    branches: [mainn]
+    branches: [masterr]
   pull_request:
-    branches: [mainn]
+    branches: [masterr]
 
 jobs:
   runningtest:

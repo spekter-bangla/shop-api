@@ -5,9 +5,9 @@ name: Running Test then Deploy to Heroku Using Docker
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   runningtest:
