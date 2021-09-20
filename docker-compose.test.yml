@@ -1,0 +1,22 @@
+version: "3"
+services:
+  nginx:
+    ports:
+      - "5000:80"
+
+  shop-api:
+    build:
+      context: .
+      args:
+        NODE_ENV: test
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=test
+    depends_on:
+      - redis
+    command: npm run test
+
+  redis:
+    image: redis

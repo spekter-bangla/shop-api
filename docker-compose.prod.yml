@@ -1,0 +1,21 @@
+version: "3"
+services:
+  nginx:
+    ports:
+      - "80:80"
+
+  shop-api:
+    deploy:
+      replicas: 8
+      restart_policy:
+        condition: any
+      update_config:
+        parallelism: 2
+        delay: 15s
+    build:
+      context: .
+      args:
+        NODE_ENV: production
+    environment:
+      - NODE_ENV=production
+    command: npm run start
