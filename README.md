@@ -1,4 +1,12 @@
-## Roadmap
+# Roadmap
+
+
+## Minimal database design
+
+![Blank diagram](https://user-images.githubusercontent.com/35952201/134859270-4415204c-a79d-4e52-8d85-c2e96eaced53.png)
+
+
+
 
 - Authentication / Authorization
 
