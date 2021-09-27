@@ -9,6 +9,12 @@ import { User } from "./user.model";
 export class UsersService {
   constructor(@InjectModel("User") private readonly userModel: Model<User>) {}
 
+  async doesUserExists(createUserDto: CreateUserDto): Promise<any> {
+    const user = await this.userModel.findOne({ email: createUserDto.email });
+    if (user) return true;
+    else return false;
+  }
+
   async insertUser(createUserDto: CreateUserDto): Promise<User> {
     const { name, email, phone, address, password } = createUserDto;
     const newUser = new this.userModel({
