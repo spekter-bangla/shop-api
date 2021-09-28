@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { FilterQuery, Model } from "mongoose";
 import { CreateUserDto } from "./dto/create-user-dto";
 
 import { User } from "./user.model";
@@ -26,5 +26,13 @@ export class UsersService {
     });
     const result = await newUser.save();
     return result;
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return this.userModel.findById(id);
+  }
+
+  async findOne(criteria: FilterQuery<User>): Promise<User | null> {
+    return this.userModel.findOne(criteria);
   }
 }
