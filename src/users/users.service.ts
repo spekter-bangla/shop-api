@@ -16,12 +16,11 @@ export class UsersService {
   }
 
   async insertUser(createUserDto: CreateUserDto): Promise<User> {
-    const { name, email, phone, address, password } = createUserDto;
+    const { name, email, phone, password } = createUserDto;
     const newUser = new this.userModel({
       name,
       email,
       phone,
-      address,
       password,
     });
     const result = await newUser.save();
