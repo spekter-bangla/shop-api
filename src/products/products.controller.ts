@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -6,13 +7,20 @@ import {
   Param,
   Post,
   Res,
+  UploadedFiles,
+  UseInterceptors,
 } from "@nestjs/common";
+import { CloudinaryService } from "src/cloudinary/cloudinary.service";
+import { MultipleImageUploadInterceptor } from "src/interceptors/MultipleImageUploadInterceptor";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { ProductsService } from "./products.service";
 
 @Controller("products")
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @Get("/")
   async getAllProduct() {
@@ -32,13 +40,34 @@ export class ProductsController {
     };
   }
 
+  @UseInterceptors(MultipleImageUploadInterceptor(3 * 1024 * 1024, 3))
   @Post("/create")
   async createProductDto(
     @Res() res,
     @Body() createProductDto: CreateProductDto,
+    @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
     // console.log(createProductDto);
-    const product = await this.productsService.createProduct(createProductDto);
+
+    if (!files) {
+      throw new BadRequestException("Please provide category image");
+    }
+
+    const fileUploadedResult = await this.cloudinaryService.uploadImages(
+      "Category",
+      files,
+    );
+
+    console.log(fileUploadedResult);
+
+    const imageUrls: string[] = [];
+    for (let i = 0; i < fileUploadedResult.length; i++) {
+      imageUrls.push(fileUploadedResult[i].url);
+    }
+    const product = await this.productsService.createProduct({
+      ...createProductDto,
+      images: imageUrls,
+    });
 
     return res.status(HttpStatus.OK).json({
       message: "Product has been created successfully",

@@ -48,7 +48,6 @@ export class ProductsService {
     });
 
     const productResult = await newProduct.save();
-
     return productResult;
   }
 }
