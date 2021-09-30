@@ -1,4 +1,13 @@
-import { Controller, Get, Param } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Res,
+} from "@nestjs/common";
+import { CreateProductDto } from "./dto/create-product.dto";
 import { ProductsService } from "./products.service";
 
 @Controller("products")
@@ -21,5 +30,19 @@ export class ProductsController {
       status: "Success",
       data: product,
     };
+  }
+
+  @Post("/create")
+  async createProductDto(
+    @Res() res,
+    @Body() createProductDto: CreateProductDto,
+  ) {
+    // console.log(createProductDto);
+    const product = await this.productsService.createProduct(createProductDto);
+
+    return res.status(HttpStatus.OK).json({
+      message: "Product has been created successfully",
+      product,
+    });
   }
 }

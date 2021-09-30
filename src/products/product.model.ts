@@ -9,7 +9,7 @@ export const ProductSchema = new Schema(
     totalStock: { type: Number, required: true },
     availableStock: { type: Number, required: true },
     rating: { type: Number, required: true },
-    images: { type: Array, required: true },
+    images: [{ type: String, required: true }],
     category: {
       type: Schema.Types.ObjectId,
       ref: "Category",
