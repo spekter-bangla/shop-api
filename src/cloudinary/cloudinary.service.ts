@@ -23,4 +23,34 @@ export class CloudinaryService {
       toStream(file.buffer).pipe(upload);
     });
   }
+
+  uploadImages(
+    folderName: string,
+    files: Array<Express.Multer.File>,
+  ): Promise<(UploadApiResponse | UploadApiErrorResponse)[]> {
+    const folder = `Shop/${folderName}`;
+    const uploadPromises: Array<
+      Promise<UploadApiResponse | UploadApiErrorResponse>
+    > = [];
+
+    files.forEach((file) => {
+      const promise: Promise<UploadApiResponse | UploadApiErrorResponse> =
+        new Promise((resolve, reject) => {
+          const upload = v2.uploader.upload_stream(
+            {
+              folder,
+              quality: 50,
+            },
+            (error, result) => {
+              if (error) return reject(error);
+              if (result) return resolve(result);
+            },
+          );
+          toStream(file.buffer).pipe(upload);
+        });
+      uploadPromises.push(promise);
+    });
+
+    return Promise.all(uploadPromises);
+  }
 }
