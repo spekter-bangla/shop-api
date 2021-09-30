@@ -47,6 +47,9 @@ export class CategoriesController {
     @Body() body: CreateCategoryDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Category> {
+    if (!file) {
+      throw new BadRequestException("Please provide category image");
+    }
     const fileUploadedResult = await this.cloudinaryService.uploadImage(
       "Category",
       file,
