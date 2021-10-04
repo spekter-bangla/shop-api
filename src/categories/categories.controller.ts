@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -11,6 +12,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
+import { DeleteResult } from "mongodb";
 import { CloudinaryService } from "../cloudinary/cloudinary.service";
 
 import { ResponseBody } from "../utils/ResponseBody";
@@ -103,6 +105,25 @@ export class CategoriesController {
     return {
       message: "Category Updated Successfully",
       data: category,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete("/:id")
+  async deleteCategory(
+    @Param("id") id: string,
+  ): Promise<ResponseBody<DeleteResult>> {
+    const category = await this.categoriesService.findById(id);
+
+    if (!category) {
+      throw new NotFoundException("Category Not Found");
+    }
+
+    const result = await this.categoriesService.delete(id);
+
+    return {
+      message: "Category Deleted Successfully",
+      data: result,
     };
   }
 }

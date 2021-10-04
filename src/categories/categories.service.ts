@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { FilterQuery, Model } from "mongoose";
+import { DeleteResult } from "mongodb";
 
 import { Category } from "./category.model";
 import { CloudinaryService } from "../cloudinary/cloudinary.service";
@@ -59,5 +60,11 @@ export class CategoriesService {
       );
     }
     return result;
+  }
+
+  async delete(id: string): Promise<DeleteResult> {
+    // TODO: check product, sub category before delete
+
+    return this.categoryModel.deleteOne({ _id: id });
   }
 }
