@@ -40,6 +40,15 @@ export class CategoriesController {
     if (!file) {
       throw new BadRequestException("Please provide category image");
     }
+    // check if already has a category with this name
+    const duplicateCategoryName =
+      await this.categoriesService.isNameAlreadyExist({
+        name: body.name,
+      });
+
+    if (duplicateCategoryName) {
+      throw new BadRequestException("A Category with this name already exists");
+    }
     const fileUploadedResult = await this.cloudinaryService.uploadImage(
       "Category",
       file,
@@ -91,6 +100,16 @@ export class CategoriesController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ResponseBody<Category>> {
     const dataToUpdate = { ...body };
+    // check if already has a category with this name
+    const duplicateCategoryName =
+      await this.categoriesService.isNameAlreadyExist({
+        id,
+        name: body.name,
+      });
+
+    if (duplicateCategoryName) {
+      throw new BadRequestException("A Category with this name already exists");
+    }
     if (file) {
       const fileUploadedResult = await this.cloudinaryService.uploadImage(
         "Category",
@@ -109,16 +128,11 @@ export class CategoriesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete("/:id")
+  @Delete("/delete/:id")
   async deleteCategory(
     @Param("id") id: string,
   ): Promise<ResponseBody<DeleteResult>> {
-    const category = await this.categoriesService.findById(id);
-
-    if (!category) {
-      throw new NotFoundException("Category Not Found");
-    }
-
+    // TODO: check product, sub category before delete
     const result = await this.categoriesService.delete(id);
 
     return {

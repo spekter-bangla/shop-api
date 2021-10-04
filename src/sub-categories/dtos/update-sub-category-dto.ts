@@ -16,4 +16,8 @@ export class UpdateSubCategoryDto {
   @IsOptional()
   @IsString()
   image: string;
+
+  @IsOptional()
+  @IsString()
+  category: string;
 }

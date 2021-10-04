@@ -16,6 +16,28 @@ export class CategoriesService {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
+  async isNameAlreadyExist(criteria: {
+    id?: string;
+    name: string;
+  }): Promise<boolean> {
+    const { id, name } = criteria;
+    let result;
+
+    if (id) {
+      result = await this.categoryModel.findOne({
+        _id: { $nin: [id] },
+        name,
+      });
+    } else {
+      result = await this.categoryModel.findOne({ name });
+    }
+
+    if (result) {
+      return true;
+    }
+    return false;
+  }
+
   async create(data: CreateCategoryDto): Promise<Category> {
     const { name, description, status, image } = data;
 
@@ -39,7 +61,27 @@ export class CategoriesService {
   }
 
   async getAll(): Promise<Category[]> {
-    return this.categoryModel.find({});
+    const result = await this.categoryModel.aggregate([
+      {
+        $lookup: {
+          from: "subcategories",
+          let: {
+            thisDocKey: `$_id`,
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: [`$category`, "$$thisDocKey"],
+                },
+              },
+            },
+          ],
+          as: "subCategories",
+        },
+      },
+    ]);
+    return result;
   }
 
   async update(id: string, data: UpdateCategoryDto): Promise<Category> {
@@ -63,8 +105,19 @@ export class CategoriesService {
   }
 
   async delete(id: string): Promise<DeleteResult> {
-    // TODO: check product, sub category before delete
+    const category = await this.findById(id);
 
-    return this.categoryModel.deleteOne({ _id: id });
+    if (!category) {
+      throw new NotFoundException("Category Not Found");
+    }
+
+    const result = this.categoryModel.deleteOne({ _id: id });
+
+    // remove image from cloudinary
+    this.cloudinaryService.deleteImages(
+      getPublicIdsFromImageUrl(category.image),
+    );
+
+    return result;
   }
 }

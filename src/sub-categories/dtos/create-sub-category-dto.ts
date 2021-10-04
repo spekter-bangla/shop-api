@@ -16,4 +16,8 @@ export class CreateSubCategoryDto {
   @IsOptional()
   @IsString()
   image: string;
+
+  @IsNotEmpty()
+  @IsString()
+  category: string;
 }
