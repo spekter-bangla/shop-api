@@ -10,7 +10,13 @@ export class OrdersItemsService {
   ) {}
 
   async findAllOrderItem(): Promise<OrderItem[]> {
-    return this.orderitemModel.find().populate("product");
+    return this.orderitemModel.find().populate({
+      path: "product",
+      populate: {
+        path: "category",
+        model: "Category",
+      },
+    });
   }
 
   async findSingleOrderItem(id: string): Promise<OrderItem> {
