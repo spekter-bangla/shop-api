@@ -1,5 +1,14 @@
-import { Controller, Get, Param } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Res,
+} from "@nestjs/common";
 import { CloudinaryService } from "src/cloudinary/cloudinary.service";
+import { createOrderItemDto } from "./dto/create-orderitems.dto";
 import { OrdersItemsService } from "./orders-items.service";
 
 @Controller("orders-items")
@@ -25,5 +34,20 @@ export class OrdersItemsController {
       status: "Success",
       data: orderItem,
     };
+  }
+
+  @Post("/create")
+  async createOrderItem(
+    @Res() res,
+    @Body() createOrderItemDto: createOrderItemDto,
+  ) {
+    const orderItem = await this.orderItemsService.createOrderItem(
+      createOrderItemDto,
+    );
+
+    return res.status(HttpStatus.OK).json({
+      message: "Order Items has been created successfully",
+      orderItem,
+    });
   }
 }
