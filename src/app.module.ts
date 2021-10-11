@@ -11,6 +11,8 @@ import { CategoriesModule } from "./categories/categories.module";
 import { OrdersModule } from "./orders/orders.module";
 import { OrdersItemsModule } from "./orders-items/orders-items.module";
 import { ProductsModule } from "./products/products.module";
+import { SubCategoriesModule } from './sub-categories/sub-categories.module';
+
 
 @Module({
   imports: [
@@ -22,6 +24,7 @@ import { ProductsModule } from "./products/products.module";
     OrdersModule,
     OrdersItemsModule,
     ProductsModule,
+    SubCategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

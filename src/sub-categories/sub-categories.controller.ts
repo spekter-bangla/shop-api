@@ -17,98 +17,103 @@ import { CloudinaryService } from "../cloudinary/cloudinary.service";
 
 import { ResponseBody } from "../utils/ResponseBody";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
-import { CategoriesService } from "./categories.service";
-import { Category } from "./category.model";
-import { CreateCategoryDto } from "./dtos/create-category-dto";
-import { UpdateCategoryDto } from "./dtos/update-category-dto";
+import { CategoriesService } from "../categories/categories.service";
+import { SubCategoriesService } from "./sub-categories.service";
+import { SubCategory } from "./sub-category.model";
+import { CreateSubCategoryDto } from "./dtos/create-sub-category-dto";
+import { UpdateSubCategoryDto } from "./dtos/update-sub-category-dto";
 import { SingleImageUploadInterceptor } from "../interceptors/SingleImageUploadInterceptor";
 
-@Controller("categories")
-export class CategoriesController {
+@Controller("sub-categories")
+export class SubCategoriesController {
   constructor(
     private readonly categoriesService: CategoriesService,
+    private readonly subCategoriesService: SubCategoriesService,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(SingleImageUploadInterceptor(3 * 1024 * 1024))
   @Post("/create")
-  async createCategory(
-    @Body() body: CreateCategoryDto,
+  async createSubCategory(
+    @Body() body: CreateSubCategoryDto,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<ResponseBody<Category>> {
+  ): Promise<ResponseBody<SubCategory>> {
     if (!file) {
-      throw new BadRequestException("Please provide category image");
+      throw new BadRequestException("Please provide sub-category image");
     }
     // check if already has a category with this name
     const duplicateCategoryName =
-      await this.categoriesService.isNameAlreadyExist({
+      await this.subCategoriesService.isNameAlreadyExist({
         name: body.name,
       });
 
     if (duplicateCategoryName) {
       throw new BadRequestException("A Category with this name already exists");
     }
-    const fileUploadedResult = await this.cloudinaryService.uploadImage(
-      "Category",
-      file,
-    );
-
-    const category = await this.categoriesService.create({
-      ...body,
-      image: fileUploadedResult.url,
-    });
-
-    return {
-      message: "Category Created Successfully",
-      data: category,
-    };
-  }
-
-  @Get("/getAll")
-  async getAllCategories(): Promise<ResponseBody<Category[]>> {
-    const allCategories = await this.categoriesService.getAll();
-
-    return {
-      message: "All categories",
-      data: allCategories,
-    };
-  }
-
-  @Get("/get/:id")
-  async getSingleCategory(
-    @Param("id") id: string,
-  ): Promise<ResponseBody<Category>> {
-    const category = await this.categoriesService.findById(id);
+    // check valid category
+    const category = await this.categoriesService.findById(body.category);
 
     if (!category) {
       throw new NotFoundException("Category Not Found");
     }
 
+    const fileUploadedResult = await this.cloudinaryService.uploadImage(
+      "Category",
+      file,
+    );
+
+    const subCategory = await this.subCategoriesService.create({
+      ...body,
+      image: fileUploadedResult.url,
+    });
+
     return {
-      message: "Category details",
-      data: category,
+      message: "SubCategory Created Successfully",
+      data: subCategory,
+    };
+  }
+
+  @Get("/get/:id")
+  async getSingleSubCategory(
+    @Param("id") id: string,
+  ): Promise<ResponseBody<SubCategory>> {
+    const subCategory = await this.subCategoriesService.findById(id);
+
+    if (!subCategory) {
+      throw new NotFoundException("SubCategory Not Found");
+    }
+
+    return {
+      message: "SubCategory details",
+      data: subCategory,
     };
   }
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(SingleImageUploadInterceptor(3 * 1024 * 1024))
   @Patch("/update/:id")
-  async updateCategory(
+  async updateSubCategory(
     @Param("id") id: string,
-    @Body() body: UpdateCategoryDto,
+    @Body() body: UpdateSubCategoryDto,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<ResponseBody<Category>> {
+  ): Promise<ResponseBody<SubCategory>> {
     const dataToUpdate = { ...body };
     // check if already has a category with this name
     const duplicateCategoryName =
-      await this.categoriesService.isNameAlreadyExist({
+      await this.subCategoriesService.isNameAlreadyExist({
         id,
         name: body.name,
       });
 
     if (duplicateCategoryName) {
       throw new BadRequestException("A Category with this name already exists");
+    }
+    // check valid category
+    const category = await this.categoriesService.findById(body.category);
+
+    if (!category) {
+      throw new NotFoundException("Category Not Found");
     }
     if (file) {
       const fileUploadedResult = await this.cloudinaryService.uploadImage(
@@ -119,24 +124,27 @@ export class CategoriesController {
       dataToUpdate.image = fileUploadedResult.url;
     }
 
-    const category = await this.categoriesService.update(id, dataToUpdate);
+    const subCategory = await this.subCategoriesService.update(
+      id,
+      dataToUpdate,
+    );
 
     return {
-      message: "Category Updated Successfully",
-      data: category,
+      message: "SubCategory Updated Successfully",
+      data: subCategory,
     };
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete("/delete/:id")
-  async deleteCategory(
+  async deleteSubCategory(
     @Param("id") id: string,
   ): Promise<ResponseBody<DeleteResult>> {
-    // TODO: check product, sub category before delete
-    const result = await this.categoriesService.delete(id);
+    // TODO: check product before delete
+    const result = await this.subCategoriesService.delete(id);
 
     return {
-      message: "Category Deleted Successfully",
+      message: "SubCategory Deleted Successfully",
       data: result,
     };
   }

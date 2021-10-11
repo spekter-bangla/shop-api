@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
-export class CreateCategoryDto {
+export class CreateSubCategoryDto {
   @IsNotEmpty()
   @IsString()
   name: string;
@@ -16,4 +16,8 @@ export class CreateCategoryDto {
   @IsOptional()
   @IsString()
   image: string;
+
+  @IsNotEmpty()
+  @IsString()
+  category: string;
 }

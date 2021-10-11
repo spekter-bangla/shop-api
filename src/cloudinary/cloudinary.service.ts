@@ -53,4 +53,15 @@ export class CloudinaryService {
 
     return Promise.all(uploadPromises);
   }
+
+  deleteImages(
+    imagePublicIds: string[],
+  ): Promise<UploadApiResponse | UploadApiErrorResponse> {
+    return new Promise((resolve, reject) => {
+      v2.api.delete_resources(imagePublicIds, (error, result) => {
+        if (error) return reject(error);
+        if (result) return resolve(result);
+      });
+    });
+  }
 }
