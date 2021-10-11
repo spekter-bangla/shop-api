@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { createOrderItemDto } from "./dto/create-orderitems.dto";
+import { CreateOrderItemDto } from "./dto/create-orderitems.dto";
 import { OrderItem } from "./order-item.model";
 
 @Injectable()
@@ -31,16 +31,17 @@ export class OrdersItemsService {
   }
 
   async createOrderItem(
-    createOrderItemDto: createOrderItemDto,
-  ): Promise<OrderItem> {
-    const { quantity, product } = createOrderItemDto;
+    createOrderItemDtos: CreateOrderItemDto[],
+  ): Promise<any> {
+    const orderItems = await this.orderitemModel.insertMany(
+      createOrderItemDtos,
+    );
+    const orderItemIds = orderItems.reduce((acc: string[], curr) => {
+      const { _id } = curr;
+      acc = [...acc, `${_id}`];
+      return acc;
+    }, []);
 
-    const newOrderItem = new this.orderitemModel({
-      quantity,
-      product,
-    });
-
-    const orderItemREsult = await newOrderItem.save();
-    return orderItemREsult;
+    return orderItemIds;
   }
 }

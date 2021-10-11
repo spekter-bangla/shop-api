@@ -8,7 +8,7 @@ import {
   Res,
 } from "@nestjs/common";
 import { CloudinaryService } from "src/cloudinary/cloudinary.service";
-import { createOrderItemDto } from "./dto/create-orderitems.dto";
+import { CreateOrderItemDto } from "./dto/create-orderitems.dto";
 import { OrdersItemsService } from "./orders-items.service";
 
 @Controller("orders-items")
@@ -39,11 +39,11 @@ export class OrdersItemsController {
   @Post("/create")
   async createOrderItem(
     @Res() res,
-    @Body() createOrderItemDto: createOrderItemDto,
+    @Body() createOrderItemDto: CreateOrderItemDto,
   ) {
-    const orderItem = await this.orderItemsService.createOrderItem(
+    const orderItem = await this.orderItemsService.createOrderItem([
       createOrderItemDto,
-    );
+    ]);
 
     return res.status(HttpStatus.OK).json({
       message: "Order Items has been created successfully",
