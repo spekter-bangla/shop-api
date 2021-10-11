@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { OrderItem } from "src/orders-items/order-item.model";
@@ -23,7 +23,22 @@ export class OrdersService {
     });
 
     await order.save();
+    return order;
+  }
 
+  async findAllOrders(): Promise<Order[]> {
+    return this.orderModel.find().populate("orderItems user");
+  }
+
+  async findSingleOrder(id: string): Promise<Order> {
+    const order = await this.orderModel
+      .findById(id)
+      .populate("orderItems user");
+
+    console.log(order);
+    if (!order) {
+      throw new NotFoundException(`Order with this id:  ${id} not found`);
+    }
     return order;
   }
 }
