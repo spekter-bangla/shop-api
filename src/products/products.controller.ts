@@ -10,8 +10,8 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from "@nestjs/common";
-import { CloudinaryService } from "src/cloudinary/cloudinary.service";
-import { MultipleImageUploadInterceptor } from "src/interceptors/MultipleImageUploadInterceptor";
+import { CloudinaryService } from "../cloudinary/cloudinary.service";
+import { MultipleImageUploadInterceptor } from "../interceptors/MultipleImageUploadInterceptor";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { ProductsService } from "./products.service";
 

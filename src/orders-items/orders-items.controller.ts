@@ -7,7 +7,7 @@ import {
   Post,
   Res,
 } from "@nestjs/common";
-import { CloudinaryService } from "src/cloudinary/cloudinary.service";
+import { CloudinaryService } from "../cloudinary/cloudinary.service";
 import { CreateOrderItemDto } from "./dto/create-orderitems.dto";
 import { OrdersItemsService } from "./orders-items.service";
 
