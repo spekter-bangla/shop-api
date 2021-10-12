@@ -35,8 +35,13 @@ export class ProductsController {
 
   @Get("/findBycategory")
   async findByFilter(@Query("category") category) {
-    const data = await this.productsService.findProductBycaregory(category);
-    // console.log(data);
+    const data = await this.productsService.findProductBycaregory(
+      category.toLowerCase(),
+    );
+    return {
+      status: "Success",
+      data: data,
+    };
   }
 
   @Get("/:id")

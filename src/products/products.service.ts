@@ -15,13 +15,11 @@ export class ProductsService {
     return this.productModel.find().populate("category");
   }
 
-  async findProductBycaregory(data) {
-    const allProdcts = await this.findAllProduct();
-    const filteredProdcts = allProdcts.map((product) => {
-      if (product.category) {
-        console.log((product.category as unknown as Category).name);
-      }
+  async findProductBycaregory(data): Promise<Product[]> {
+    const filteredProdcts = await this.productModel.find({
+      category: data,
     });
+    return filteredProdcts;
   }
 
   async findSingleProduct(id: string): Promise<Product> {
