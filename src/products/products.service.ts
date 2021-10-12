@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
+import { Category } from "src/categories/category.model";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { Product } from "./product.model";
 
@@ -11,7 +12,16 @@ export class ProductsService {
   ) {}
 
   async findAllProduct(): Promise<Product[]> {
-    return this.productModel.find();
+    return this.productModel.find().populate("category");
+  }
+
+  async findProductBycaregory(data) {
+    const allProdcts = await this.findAllProduct();
+    const filteredProdcts = allProdcts.map((product) => {
+      if (product.category) {
+        console.log((product.category as unknown as Category).name);
+      }
+    });
   }
 
   async findSingleProduct(id: string): Promise<Product> {

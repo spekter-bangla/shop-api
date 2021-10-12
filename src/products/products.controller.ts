@@ -1,4 +1,4 @@
-import { Express } from "express";
+import { Express, query } from "express";
 import {
   BadRequestException,
   Body,
@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   Res,
   UploadedFiles,
   UseInterceptors,
@@ -30,6 +31,12 @@ export class ProductsController {
       status: "Success",
       data: productAll,
     };
+  }
+
+  @Get("/findBycategory")
+  async findByFilter(@Query("category") category) {
+    const data = await this.productsService.findProductBycaregory(category);
+    // console.log(data);
   }
 
   @Get("/:id")
