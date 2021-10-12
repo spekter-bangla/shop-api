@@ -12,7 +12,7 @@ export class ProductsService {
   ) {}
 
   async findAllProduct(): Promise<Product[]> {
-    return this.productModel.find().populate("category");
+    return this.productModel.find();
   }
 
   async findProductBycaregory(data): Promise<Product[]> {

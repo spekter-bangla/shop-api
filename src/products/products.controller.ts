@@ -25,22 +25,16 @@ export class ProductsController {
   ) {}
 
   @Get("/")
-  async getAllProduct() {
-    const productAll = await this.productsService.findAllProduct();
+  async getAllProduct(@Query("category") category) {
+    let productAll;
+    if (category) {
+      console.log("ok");
+      productAll = await this.productsService.findProductBycaregory(category);
+    } else productAll = await this.productsService.findAllProduct();
     return {
       status: "Success",
+      count: productAll.length,
       data: productAll,
-    };
-  }
-
-  @Get("/findBycategory")
-  async findByFilter(@Query("category") category) {
-    const data = await this.productsService.findProductBycaregory(
-      category.toLowerCase(),
-    );
-    return {
-      status: "Success",
-      data: data,
     };
   }
 
