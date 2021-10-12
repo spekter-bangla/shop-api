@@ -30,4 +30,5 @@ export interface Product extends Document {
   availableStock: number;
   rating: number;
   images: Array<any>;
+  category: string;
 }

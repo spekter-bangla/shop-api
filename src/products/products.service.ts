@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
+import { Category } from "src/categories/category.model";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { Product } from "./product.model";
 
@@ -12,6 +13,13 @@ export class ProductsService {
 
   async findAllProduct(): Promise<Product[]> {
     return this.productModel.find();
+  }
+
+  async findProductBycaregory(data): Promise<Product[]> {
+    const filteredProdcts = await this.productModel.find({
+      category: data,
+    });
+    return filteredProdcts;
   }
 
   async findSingleProduct(id: string): Promise<Product> {
