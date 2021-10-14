@@ -34,7 +34,6 @@ export class OrdersService {
       .findById(id)
       .populate("orderItems user");
 
-    console.log(order);
     if (!order) {
       throw new NotFoundException(`Order with this id:  ${id} not found`);
     }
