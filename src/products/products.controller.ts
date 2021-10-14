@@ -1,4 +1,4 @@
-import { Express, query } from "express";
+import { Express } from "express";
 import {
   BadRequestException,
   Body,
@@ -25,16 +25,22 @@ export class ProductsController {
   ) {}
 
   @Get("/")
-  async getAllProduct(@Query("category") category) {
-    let productAll;
-    if (category) {
-      console.log("ok");
-      productAll = await this.productsService.findProductBycaregory(category);
-    } else productAll = await this.productsService.findAllProduct();
+  async getAllProduct(@Query() query) {
+    const { category, page = 1, limit = 40 } = query;
+
+    if (!category) {
+      throw new BadRequestException("Please Provide a Category Id");
+    }
+
+    const allProducts = await this.productsService.findProductByCategory(
+      category,
+      page,
+      limit,
+    );
+
     return {
       status: "Success",
-      count: productAll.length,
-      data: productAll,
+      data: allProducts,
     };
   }
 
@@ -54,8 +60,6 @@ export class ProductsController {
     @Body() createProductDto: CreateProductDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    // console.log(createProductDto);
-
     if (!files) {
       throw new BadRequestException("Please provide category image");
     }
@@ -64,8 +68,6 @@ export class ProductsController {
       "Category",
       files,
     );
-
-    console.log(fileUploadedResult);
 
     const imageUrls: string[] = [];
     for (let i = 0; i < fileUploadedResult.length; i++) {

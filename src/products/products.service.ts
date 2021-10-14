@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
-import { Category } from "src/categories/category.model";
+import { Model, Types } from "mongoose";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { Product } from "./product.model";
+import { addPagination } from "../utils/addPagination";
 
 @Injectable()
 export class ProductsService {
@@ -15,11 +15,13 @@ export class ProductsService {
     return this.productModel.find();
   }
 
-  async findProductBycaregory(data): Promise<Product[]> {
-    const filteredProdcts = await this.productModel.find({
-      category: data,
-    });
-    return filteredProdcts;
+  async findProductByCategory(categoryId: string, page: number, limit: number) {
+    const [data] = await this.productModel.aggregate([
+      { $match: { category: new Types.ObjectId(categoryId) } },
+      ...addPagination(page, limit),
+    ]);
+
+    return data;
   }
 
   async findSingleProduct(id: string): Promise<Product> {
