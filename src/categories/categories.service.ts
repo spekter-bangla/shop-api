@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { FilterQuery, Model } from "mongoose";
+import { FilterQuery, Model, Types } from "mongoose";
 import { DeleteResult } from "mongodb";
 
 import { Category } from "./category.model";
@@ -53,7 +53,31 @@ export class CategoriesService {
   }
 
   async findById(id: string): Promise<Category | null> {
-    return this.categoryModel.findById(id);
+    const [result] = await this.categoryModel.aggregate([
+      {
+        $match: { _id: new Types.ObjectId(id) },
+      },
+      {
+        $lookup: {
+          from: "subcategories",
+          let: {
+            thisDocKey: `$_id`,
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: [`$category`, "$$thisDocKey"],
+                },
+              },
+            },
+          ],
+          as: "subCategories",
+        },
+      },
+    ]);
+
+    return result;
   }
 
   async findOne(criteria: FilterQuery<Category>): Promise<Category | null> {
