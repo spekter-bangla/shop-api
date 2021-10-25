@@ -1,3 +1,17 @@
+interface PageInfo {
+  page: number;
+  limit: number;
+}
+
+export interface PaginationResult<T> {
+  result: T[];
+  totalResult: number;
+  totalPage: number;
+  previous: PageInfo | null;
+  current: PageInfo;
+  next: PageInfo | null;
+}
+
 export const addPagination = (
   page: number | string = 1,
   limit: number | string = 80,

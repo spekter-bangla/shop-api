@@ -4,8 +4,8 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
-  Res,
   UseGuards,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
@@ -13,15 +13,22 @@ import { CreateOrderDto } from "./dto/create-order.dto";
 import { OrdersService } from "./orders.service";
 
 @Controller("orders")
+@UseGuards(JwtAuthGuard)
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Get("/")
-  async getAllOrder() {
-    const orderAll = await this.ordersService.findAllOrders();
+  async getAllMyOrders(@Req() req, @Query() query) {
+    const { page = 1, limit = 40 } = query;
+
+    const allOrders = await this.ordersService.findAllMyOrders(
+      req.user._id,
+      page,
+      limit,
+    );
     return {
       status: "Success",
-      data: orderAll,
+      data: allOrders,
     };
   }
 
@@ -35,7 +42,6 @@ export class OrdersController {
   }
 
   @Post("/create")
-  @UseGuards(JwtAuthGuard)
   async createOrderItem(@Req() req, @Body() data: CreateOrderDto) {
     return this.ordersService.createOrder(data, req.user._id);
   }
