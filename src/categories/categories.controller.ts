@@ -72,6 +72,7 @@ export class CategoriesController {
 
     return {
       message: "All categories",
+      count: allCategories.length,
       data: allCategories,
     };
   }
