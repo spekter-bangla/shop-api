@@ -5,7 +5,7 @@ export class CreateRatingDto {
   productId: string;
 
   @IsInt()
-  @Min(0)
-  @Max(10)
-  rate: number;
+  @Min(1)
+  @Max(5)
+  rating: number;
 }

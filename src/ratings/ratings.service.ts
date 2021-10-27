@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { FilterQuery, Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { CreateRatingDto } from "./dtos/create-rating.dto";
 
 import { Rating } from "./rating.model";
@@ -14,31 +14,45 @@ export class RatingsService {
   async createRating(
     userId: string,
     createRatingData: CreateRatingDto,
-  ): Promise<Rating> {
-    const { productId, rate } = createRatingData;
+  ): Promise<Rating & { avg_rating: number }> {
+    const { productId, rating } = createRatingData;
+
+    let ratingInfo: (Rating & { avg_rating?: number }) | null;
 
     // check if already rated
-    const userRating = await this.ratingModel.findOne({
+    ratingInfo = await this.ratingModel.findOne({
       user: userId,
       product: productId,
     });
 
-    if (!userRating) {
-      const newRating = new this.ratingModel({
+    if (!ratingInfo) {
+      // user giving rating for the first time
+      ratingInfo = new this.ratingModel({
         user: userId,
         product: productId,
-        rate,
+        rating,
       });
 
-      return newRating.save();
+      ratingInfo.save();
+    } else {
+      // user already rated, now want to update
+      ratingInfo.rating = rating;
+      await ratingInfo.save();
     }
 
-    // user already rated, now want to update
-    userRating.rate = rate;
-    return userRating.save();
-  }
+    // add avg_rate
+    const [{ avg_rating }] = await this.ratingModel.aggregate([
+      {
+        $match: { product: new Types.ObjectId(productId) },
+      },
+      {
+        $group: {
+          _id: "$product",
+          avg_rating: { $avg: "$rating" },
+        },
+      },
+    ]);
 
-  // async getProductRating(productId: string): Promise<number> {
-  //   return this.ratingModel.findById(id);
-  // }
+    return { ...ratingInfo.toJSON(), avg_rating } as any;
+  }
 }

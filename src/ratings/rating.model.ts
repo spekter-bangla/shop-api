@@ -8,7 +8,7 @@ const RatingSchema = new Schema(
       ref: "Product",
       required: true,
     },
-    rate: { type: Number, min: 1, max: 5, required: true },
+    rating: { type: Number, min: 1, max: 5, required: true },
   },
   {
     timestamps: true,
@@ -22,5 +22,5 @@ export { RatingSchema };
 export interface Rating extends Document {
   user: string;
   product: string;
-  rate: number;
+  rating: number;
 }
