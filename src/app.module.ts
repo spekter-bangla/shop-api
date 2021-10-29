@@ -12,6 +12,8 @@ import { OrdersModule } from "./orders/orders.module";
 import { OrdersItemsModule } from "./orders-items/orders-items.module";
 import { ProductsModule } from "./products/products.module";
 import { SubCategoriesModule } from "./sub-categories/sub-categories.module";
+import { RolesGuard } from "./auth/guards/roles.guard";
+import { APP_GUARD } from "@nestjs/core";
 
 @Module({
   imports: [
