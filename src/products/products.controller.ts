@@ -40,7 +40,6 @@ export class ProductsController {
 
     return {
       status: "Success",
-      count: allProducts.length,
       data: allProducts,
     };
   }
@@ -50,7 +49,6 @@ export class ProductsController {
     const recentProducts = await this.productsService.latestProduct();
     return {
       status: "Success",
-      count: recentProducts.length,
       data: recentProducts,
     };
   }
