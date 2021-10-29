@@ -24,6 +24,10 @@ export class ProductsService {
     return data;
   }
 
+  async latestProduct(): Promise<Product[]> {
+    return this.productModel.find({}).sort({ createdAt: -1 }).limit(10);
+  }
+
   async findSingleProduct(id: string): Promise<Product> {
     const product = await this.productModel.findById(id).populate("category");
     if (!product) {
