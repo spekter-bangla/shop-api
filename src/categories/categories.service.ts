@@ -8,6 +8,7 @@ import { CloudinaryService } from "../cloudinary/cloudinary.service";
 import { CreateCategoryDto } from "./dtos/create-category-dto";
 import { UpdateCategoryDto } from "./dtos/update-category-dto";
 import { getPublicIdsFromImageUrl } from "../utils/getPublicIdsFromImageUrl";
+import { AllCustomErrors } from "../utils/product.custom-errors";
 
 @Injectable()
 export class CategoriesService {
@@ -53,6 +54,11 @@ export class CategoriesService {
   }
 
   async findById(id: string): Promise<Category | null> {
+    const isvalidId = Types.ObjectId.isValid(id);
+    if (!isvalidId) {
+      throw new NotFoundException(AllCustomErrors.invalidObjectIdError);
+    }
+
     const [result] = await this.categoryModel.aggregate([
       {
         $match: { _id: new Types.ObjectId(id) },
@@ -129,6 +135,10 @@ export class CategoriesService {
   }
 
   async delete(id: string): Promise<DeleteResult> {
+    const isvalidId = Types.ObjectId.isValid(id);
+    if (!isvalidId) {
+      throw new NotFoundException(AllCustomErrors.invalidObjectIdError);
+    }
     const category = await this.findById(id);
 
     if (!category) {

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
+import { AllCustomErrors } from "../utils/product.custom-errors";
 import { CreateOrderItemDto } from "./dto/create-orderitems.dto";
 import { OrderItem } from "./order-item.model";
 
@@ -21,6 +22,10 @@ export class OrdersItemsService {
   }
 
   async findSingleOrderItem(id: string): Promise<OrderItem> {
+    const isvalidId = Types.ObjectId.isValid(id);
+    if (!isvalidId) {
+      throw new NotFoundException(AllCustomErrors.invalidObjectIdError);
+    }
     const orderItem = await this.orderitemModel
       .findById(id)
       .populate("product");

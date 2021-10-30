@@ -6,6 +6,7 @@ import { addPagination, PaginationResult } from "../utils/addPagination";
 import { OrdersItemsService } from "../orders-items/orders-items.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { Order } from "./oder.model";
+import { AllCustomErrors } from "../utils/product.custom-errors";
 
 @Injectable()
 export class OrdersService {
@@ -138,6 +139,10 @@ export class OrdersService {
   }
 
   async findSingleOrder(id: string): Promise<Order> {
+    const isvalidId = Types.ObjectId.isValid(id);
+    if (!isvalidId) {
+      throw new NotFoundException(AllCustomErrors.invalidObjectIdError);
+    }
     const order = await this.orderModel
       .findById(id)
       .populate("orderItems user");
