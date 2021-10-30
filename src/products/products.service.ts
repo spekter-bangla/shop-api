@@ -4,6 +4,7 @@ import { Model, Types } from "mongoose";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { Product } from "./product.model";
 import { addPagination } from "../utils/addPagination";
+import { AllErrors } from "../utils/product.custom-errors";
 
 @Injectable()
 export class ProductsService {
@@ -29,6 +30,10 @@ export class ProductsService {
   }
 
   async findSingleProduct(id: string): Promise<Product> {
+    const isvalidId = Types.ObjectId.isValid(id);
+    if (!isvalidId) {
+      throw new NotFoundException(AllErrors.invalidObjectIdError);
+    }
     const product = await this.productModel.findById(id).populate("category");
     if (!product) {
       throw new NotFoundException(`Product with this id:  ${id} not found`);
