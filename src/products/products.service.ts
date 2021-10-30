@@ -32,7 +32,10 @@ export class ProductsService {
   async findSingleProduct(id: string): Promise<Product> {
     const isvalidId = Types.ObjectId.isValid(id);
     if (!isvalidId) {
-      throw new NotFoundException(AllCustomErrors.invalidObjectIdError);
+      throw new NotFoundException({
+        statusCode: 404,
+        error: "ObjectId is not valid!",
+      });
     }
     const product = await this.productModel.findById(id).populate("category");
     if (!product) {

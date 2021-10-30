@@ -2,7 +2,12 @@ export const AllCustomErrors = {
   // ... other errors
 
   invalidObjectIdError: {
-    errorMessage: "ObjectId is not valid",
-    reason: `Provided ObjectId is not a proper Mongoose Object Id`,
+    statusCode: 404,
+    message: "ObjectId is not valid!",
+  },
+
+  unAuthorizedError: {
+    errorMessage: "Unauthorized!",
+    reason: `You are not authorized for this Operation`,
   },
 };

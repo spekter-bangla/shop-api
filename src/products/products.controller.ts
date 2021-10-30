@@ -30,8 +30,6 @@ export class ProductsController {
   ) {}
 
   @Get("/")
-  @UseGuards(JwtAuthGuard)
-  @Roles(Role.ADMIN)
   async getAllProduct(@Query() query) {
     const { category, page = 1, limit = 40 } = query;
 
@@ -53,7 +51,7 @@ export class ProductsController {
 
   @Get("/recentproducts")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.USER)
+  @Roles(Role.ADMIN)
   async getRecentProducts() {
     const recentProducts = await this.productsService.latestProduct();
     return {
