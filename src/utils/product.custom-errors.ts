@@ -1,8 +1,8 @@
-export const AllErrors = {
+export const AllCustomErrors = {
   // ... other errors
 
   invalidObjectIdError: {
     errorMessage: "ObjectId is not valid",
-    reason: `Provided user id is not a proper Mongoose Object Id`,
+    reason: `Provided ObjectId is not a proper Mongoose Object Id`,
   },
 };
