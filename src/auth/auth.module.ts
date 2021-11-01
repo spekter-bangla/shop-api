@@ -8,8 +8,6 @@ import { AuthController } from "./auth.controller";
 import { UsersModule } from "../users/users.module";
 import { LocalStrategy } from "./local.strategy";
 import { JwtStrategy } from "./jwt.strategy";
-import { APP_GUARD } from "@nestjs/core";
-import { RolesGuard } from "./guards/roles.guard";
 
 @Module({
   imports: [
@@ -29,15 +27,7 @@ import { RolesGuard } from "./guards/roles.guard";
     //   inject: [ConfigService],
     // }),
   ],
-  providers: [
-    AuthService,
-    LocalStrategy,
-    JwtStrategy,
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: RolesGuard,
-    // },
-  ],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
