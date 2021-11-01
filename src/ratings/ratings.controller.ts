@@ -8,9 +8,11 @@ import {
 } from "@nestjs/common";
 import { CreateRatingDto } from "./dtos/create-rating.dto";
 
+import { ResponseBody } from "../utils/ResponseBody";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { RatingsService } from "./ratings.service";
 import { ProductsService } from "../products/products.service";
+import { Rating } from "./rating.model";
 
 @Controller("ratings")
 @UseGuards(JwtAuthGuard)
@@ -21,7 +23,10 @@ export class RatingsController {
   ) {}
 
   @Post("/create")
-  async rateProduct(@Req() req, @Body() createRatingData: CreateRatingDto) {
+  async rateProduct(
+    @Req() req,
+    @Body() createRatingData: CreateRatingDto,
+  ): Promise<ResponseBody<Rating & { avg_rating: number }>> {
     // check product exists
     const isProductExists = await this.productsService.isProductExists(
       createRatingData.productId,
@@ -43,6 +48,9 @@ export class RatingsController {
       ratingInfo.avg_rating,
     );
 
-    return ratingInfo;
+    return {
+      message: "Product Rated Successfully",
+      data: ratingInfo,
+    };
   }
 }
