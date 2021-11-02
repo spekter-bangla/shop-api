@@ -64,4 +64,12 @@ export class ProductsService {
     const productResult = await newProduct.save();
     return productResult;
   }
+
+  async isProductExists(productId: string): Promise<boolean> {
+    return this.productModel.exists({ _id: productId });
+  }
+
+  async updateProductRating(productId: string, rating: number): Promise<void> {
+    await this.productModel.findByIdAndUpdate(productId, { rating });
+  }
 }

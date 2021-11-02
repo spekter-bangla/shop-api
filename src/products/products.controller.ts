@@ -10,12 +10,16 @@ import {
   Query,
   Res,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
 import { CloudinaryService } from "../cloudinary/cloudinary.service";
 import { MultipleImageUploadInterceptor } from "../interceptors/MultipleImageUploadInterceptor";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { ProductsService } from "./products.service";
+import { Role } from "../users/user.model";
+import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { RolesGuard } from "../auth/guards/roles.guard";
 
 @Controller("products")
 export class ProductsController {
@@ -62,6 +66,7 @@ export class ProductsController {
     };
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard(Role.ADMIN))
   @UseInterceptors(MultipleImageUploadInterceptor(3 * 1024 * 1024, 3))
   @Post("/create")
   async createProductDto(
