@@ -23,6 +23,8 @@ import { Category } from "./category.model";
 import { CreateCategoryDto } from "./dtos/create-category-dto";
 import { UpdateCategoryDto } from "./dtos/update-category-dto";
 import { SingleImageUploadInterceptor } from "../interceptors/SingleImageUploadInterceptor";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { Role } from "../users/user.model";
 
 @Controller("categories")
 export class CategoriesController {
@@ -31,7 +33,7 @@ export class CategoriesController {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard(Role.ADMIN))
   @UseInterceptors(SingleImageUploadInterceptor(3 * 1024 * 1024))
   @Post("/create")
   async createCategory(
@@ -92,7 +94,7 @@ export class CategoriesController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard(Role.ADMIN))
   @UseInterceptors(SingleImageUploadInterceptor(3 * 1024 * 1024))
   @Patch("/update/:id")
   async updateCategory(
@@ -128,7 +130,7 @@ export class CategoriesController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard(Role.ADMIN))
   @Delete("/delete/:id")
   async deleteCategory(
     @Param("id") id: string,

@@ -17,7 +17,6 @@ import { CloudinaryService } from "../cloudinary/cloudinary.service";
 import { MultipleImageUploadInterceptor } from "../interceptors/MultipleImageUploadInterceptor";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { ProductsService } from "./products.service";
-// import { Roles } from "../auth/decorators/roles.decorator";
 import { Role } from "../users/user.model";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
@@ -50,8 +49,6 @@ export class ProductsController {
   }
 
   @Get("/recentproducts")
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(Role.USER)
   async getRecentProducts() {
     const recentProducts = await this.productsService.latestProduct();
     return {
