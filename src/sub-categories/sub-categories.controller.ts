@@ -24,6 +24,8 @@ import { SubCategory } from "./sub-category.model";
 import { CreateSubCategoryDto } from "./dtos/create-sub-category-dto";
 import { UpdateSubCategoryDto } from "./dtos/update-sub-category-dto";
 import { SingleImageUploadInterceptor } from "../interceptors/SingleImageUploadInterceptor";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { Role } from "../users/user.model";
 
 @Controller("sub-categories")
 export class SubCategoriesController {
@@ -33,7 +35,7 @@ export class SubCategoriesController {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard(Role.ADMIN))
   @UseInterceptors(SingleImageUploadInterceptor(3 * 1024 * 1024))
   @Post("/create")
   async createSubCategory(
@@ -91,7 +93,7 @@ export class SubCategoriesController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard(Role.ADMIN))
   @UseInterceptors(SingleImageUploadInterceptor(3 * 1024 * 1024))
   @Patch("/update/:id")
   async updateSubCategory(
@@ -136,7 +138,7 @@ export class SubCategoriesController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard(Role.ADMIN))
   @Delete("/delete/:id")
   async deleteSubCategory(
     @Param("id") id: string,
