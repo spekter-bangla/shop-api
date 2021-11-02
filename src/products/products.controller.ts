@@ -44,6 +44,15 @@ export class ProductsController {
     };
   }
 
+  @Get("/recentproducts")
+  async getRecentProducts() {
+    const recentProducts = await this.productsService.latestProduct();
+    return {
+      status: "Success",
+      data: recentProducts,
+    };
+  }
+
   @Get("/:id")
   async getSingleProduct(@Param("id") id: string) {
     const product = await this.productsService.findSingleProduct(id);
