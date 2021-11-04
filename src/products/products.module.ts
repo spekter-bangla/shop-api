@@ -1,6 +1,8 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+
 import { CloudinaryModule } from "../cloudinary/cloudinary.module";
+import { CategoriesModule } from "../categories/categories.module";
 import { ProductSchema } from "./product.model";
 import { ProductsController } from "./products.controller";
 import { ProductsService } from "./products.service";
@@ -9,8 +11,8 @@ import { ProductsService } from "./products.service";
   imports: [
     MongooseModule.forFeature([{ name: "Product", schema: ProductSchema }]),
     CloudinaryModule,
+    CategoriesModule,
   ],
-
   controllers: [ProductsController],
   providers: [ProductsService],
   exports: [ProductsService],
