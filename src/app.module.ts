@@ -5,6 +5,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 
+import { MailModule } from "./mail/mail.module";
 import { UsersModule } from "./users/users.module";
 import { AuthModule } from "./auth/auth.module";
 import { CategoriesModule } from "./categories/categories.module";
@@ -16,8 +17,9 @@ import { RatingsModule } from "./ratings/ratings.module";
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGO_URI!),
+    MailModule,
     UsersModule,
     AuthModule,
     CategoriesModule,

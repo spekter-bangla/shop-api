@@ -27,6 +27,7 @@
     "docker-prod-down": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml down"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^1.6.0",
     "@nestjs/cli": "^8.0.0",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^1.0.1",
@@ -40,8 +41,10 @@
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "cloudinary": "^1.27.0",
+    "ejs": "^3.1.6",
     "moment": "^2.29.1",
     "mongoose": "^6.0.6",
+    "nodemailer": "^6.7.0",
     "passport": "^0.5.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
@@ -58,6 +61,7 @@
     "@types/mongoose": "^5.11.97",
     "@types/multer": "^1.4.7",
     "@types/node": "^16.0.0",
+    "@types/nodemailer": "^6.4.4",
     "@types/passport-jwt": "^3.0.6",
     "@types/passport-local": "^1.0.34",
     "@types/supertest": "^2.0.11",
