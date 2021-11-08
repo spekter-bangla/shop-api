@@ -3,16 +3,18 @@ import { JwtService } from "@nestjs/jwt";
 
 import { User } from "../users/user.model";
 import { UsersService } from "../users/users.service";
-import { MailService } from "../mail/mail.service";
+import { RedisService } from "../redis/redis.service";
+import { MailNotificationService } from "../mail-notifications/mail-notifications.service";
 import { CreateUserDto } from "../users/dto/create-user-dto";
-import { makeId } from "../utils/makeId";
+import { createVerifyEmailLink } from "../utils/createEmailLink";
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    private mailService: MailService,
+    private redisService: RedisService,
+    private mailNotificationService: MailNotificationService,
   ) {}
   async createUser(createUserData: CreateUserDto) {
     if (await this.usersService.doesUserExists(createUserData)) {
@@ -22,7 +24,26 @@ export class AuthService {
     }
 
     const user = await this.usersService.insertUser(createUserData);
-    await this.mailService.sendUserConfirmation(user, makeId(6));
+    const url = await createVerifyEmailLink(
+      process.env.BACKEND_HOST!,
+      user._id,
+      this.redisService,
+    );
+    // save to notification
+    await this.mailNotificationService.create([
+      {
+        user: user._id,
+        recipient: user.email,
+        subject: "Verify Your Email Address",
+        template: "./confirmation",
+        context: {
+          url,
+          name: user.name,
+        },
+        schedule: "Emergency",
+      },
+    ]);
+    this.mailNotificationService.sendBySchedule("Emergency");
 
     return {
       message:
