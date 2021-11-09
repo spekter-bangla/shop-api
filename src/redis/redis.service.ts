@@ -4,10 +4,17 @@ import { Redis } from "ioredis";
 
 @Injectable()
 export class RedisService {
-  constructor(@InjectRedis("default") private readonly redisService: Redis) {}
+  constructor(@InjectRedis("default") private readonly redisClient: Redis) {}
 
-  async get(key: string) {}
+  async get(key: string): Promise<string | null> {
+    return this.redisClient.get(key);
+  }
+
   async set(key: string, value: string, expiryTime: number) {
-    return this.redisService.set(key, value, "ex", expiryTime);
+    return this.redisClient.set(key, value, "ex", expiryTime);
+  }
+
+  async del(key: string): Promise<number> {
+    return this.redisClient.del(key);
   }
 }

@@ -9,7 +9,7 @@ export const createVerifyEmailLink = async (
 ): Promise<string> => {
   const id = v4();
   await redis.set(id, userId, 60 * 60 * 24 * 30); // 30 day expired time
-  return `${url}/api/v1/auth/verify/${id}`;
+  return `${url}/verify/${id}`;
 };
 
 export const createForgotPasswordLink = async (

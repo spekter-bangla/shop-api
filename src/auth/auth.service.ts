@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 
 import { User } from "../users/user.model";
@@ -18,14 +18,12 @@ export class AuthService {
   ) {}
   async createUser(createUserData: CreateUserDto) {
     if (await this.usersService.doesUserExists(createUserData)) {
-      return {
-        message: "User already exists",
-      };
+      throw new BadRequestException("Email already exists");
     }
 
     const user = await this.usersService.insertUser(createUserData);
     const url = await createVerifyEmailLink(
-      process.env.BACKEND_HOST!,
+      process.env.FRONTEND_HOST!,
       user._id,
       this.redisService,
     );
@@ -45,28 +43,41 @@ export class AuthService {
     ]);
     this.mailNotificationService.sendBySchedule("Emergency");
 
-    return {
-      message:
-        "Registration Successfull, Verification Mail Has Been Sent To Your Email Address, Please Verify Your Email Address!",
-      user,
-    };
+    return user;
+  }
+
+  async varifyUser(id: string): Promise<boolean> {
+    const userId = await this.redisService.get(id);
+
+    if (!userId) {
+      return false;
+    }
+
+    await this.usersService.updateOne({ _id: userId }, { verified: true });
+    await this.redisService.del(id);
+
+    return true;
   }
 
   async getUserById(userId) {
     return this.usersService.findById(userId);
   }
 
-  async validateUser(email: string, password: string): Promise<User | null> {
+  async validateUser(email: string, password: string): Promise<User | string> {
     const user = await this.usersService.findOne({ email });
 
     if (!user) {
-      return null;
+      return "Email/Password doesn't match!";
     }
 
     const valid = await user.validatePassword(password);
 
     if (!valid) {
-      return null;
+      return "Email/Password doesn't match!";
+    }
+
+    if (!user.verified) {
+      return "Please Verify Your Email Address First!";
     }
 
     return user;

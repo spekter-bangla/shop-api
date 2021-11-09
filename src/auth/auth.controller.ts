@@ -1,8 +1,19 @@
-import { Body, Controller, Post, Request, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Request,
+  UseGuards,
+} from "@nestjs/common";
 
 import { AuthService } from "./auth.service";
 import { LocalAuthGuard } from "./local-auth.guard";
 import { CreateUserDto } from "../users/dto/create-user-dto";
+import { ResponseBody } from "../utils/ResponseBody";
+import { User } from "../users/user.model";
 
 @Controller("auth")
 export class AuthController {
@@ -10,14 +21,40 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post("/login")
-  async login(@Request() req) {
+  async login(
+    @Request() req,
+  ): Promise<ResponseBody<{ accessToken: string; user: User }>> {
     const { accessToken } = await this.authService.createAccessToken(req.user);
 
-    return { accessToken, user: req.user };
+    return {
+      message: "Successfully Logged In!",
+      data: { accessToken, user: req.user },
+    };
   }
 
   @Post("/register")
-  async register(@Body() registerData: CreateUserDto) {
-    return this.authService.createUser(registerData);
+  async register(
+    @Body() registerData: CreateUserDto,
+  ): Promise<ResponseBody<User>> {
+    const user = await this.authService.createUser(registerData);
+
+    return {
+      message:
+        "Registration Successfull, Verification Mail Has Been Sent To Your Email Address, Please Verify Your Email Address!",
+      data: user,
+    };
+  }
+
+  @Get("/verify/:id")
+  async verifyUser(@Param("id") id: string): Promise<ResponseBody> {
+    const varified = await this.authService.varifyUser(id);
+
+    if (!varified) {
+      throw new BadRequestException("Link has expired!");
+    }
+
+    return {
+      message: "Successfully Verified!",
+    };
   }
 }

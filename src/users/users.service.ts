@@ -1,15 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { FilterQuery, Model } from "mongoose";
-import { CreateUserDto } from "./dto/create-user-dto";
+import { UpdateResult } from "mongodb";
 
+import { CreateUserDto } from "./dto/create-user-dto";
 import { User } from "./user.model";
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel("User") private readonly userModel: Model<User>) {}
 
-  async doesUserExists(createUserDto: CreateUserDto): Promise<any> {
+  async doesUserExists(createUserDto: CreateUserDto): Promise<boolean> {
     const user = await this.userModel.findOne({ email: createUserDto.email });
     if (user) return true;
     else return false;
@@ -33,5 +34,12 @@ export class UsersService {
 
   async findOne(criteria: FilterQuery<User>): Promise<User | null> {
     return this.userModel.findOne(criteria);
+  }
+
+  async updateOne(
+    criteria: FilterQuery<User>,
+    updateData: Partial<User>,
+  ): Promise<UpdateResult> {
+    return this.userModel.updateOne(criteria, updateData);
   }
 }
