@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 
 import { User } from "../users/user.model";
@@ -6,7 +10,10 @@ import { UsersService } from "../users/users.service";
 import { RedisService } from "../redis/redis.service";
 import { MailNotificationService } from "../mail-notifications/mail-notifications.service";
 import { CreateUserDto } from "../users/dto/create-user-dto";
-import { createVerifyEmailLink } from "../utils/createEmailLink";
+import {
+  createVerifyEmailLink,
+  createForgotPasswordLink,
+} from "../utils/createEmailLink";
 
 @Injectable()
 export class AuthService {
@@ -81,6 +88,58 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async forgotPassword(email: string): Promise<void> {
+    const user = await this.usersService.findOne({ email });
+
+    if (!user) {
+      throw new BadRequestException("Email does not match to any account");
+    }
+
+    const url = await createForgotPasswordLink(
+      process.env.FRONTEND_HOST!,
+      user._id,
+      this.redisService,
+    );
+    // save to notification
+    await this.mailNotificationService.create([
+      {
+        user: user._id,
+        recipient: user.email,
+        subject: "Forgot Password Change",
+        template: "./forgotpassword",
+        context: {
+          url,
+          name: user.name,
+        },
+        schedule: "Emergency",
+      },
+    ]);
+
+    this.mailNotificationService.sendBySchedule("Emergency");
+  }
+
+  async changeForgotPassword(key: string, newPassword: string): Promise<void> {
+    const redisKey = `forgotPassword:${key}`;
+
+    const userId = await this.redisService.get(redisKey);
+    if (!userId) {
+      throw new BadRequestException("Key has expired");
+    }
+
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException("User Not Found");
+    }
+
+    user.password = newPassword;
+    const updatePromise = user.save();
+
+    const deleteKeyPromise = this.redisService.del(redisKey);
+
+    await Promise.all([updatePromise, deleteKeyPromise]);
   }
 
   async createAccessToken(user: User) {

@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
   UseGuards,
 } from "@nestjs/common";
@@ -55,6 +56,34 @@ export class AuthController {
 
     return {
       message: "Successfully Verified!",
+    };
+  }
+
+  @Get("/forgotpassword")
+  async forgotPassword(@Query("email") email: string): Promise<ResponseBody> {
+    if (!email) {
+      throw new BadRequestException("Please Provide Your Email Address");
+    }
+
+    await this.authService.forgotPassword(email);
+
+    return {
+      message: `An email has been sent to ${email} with further instructions.`,
+    };
+  }
+
+  @Post("/changepassword")
+  async changeForgotPassword(
+    @Body() { key, newPassword }: { key: string; newPassword: string },
+  ): Promise<ResponseBody> {
+    if (!key || !newPassword) {
+      throw new BadRequestException("Please Provide Key and New Password");
+    }
+
+    await this.authService.changeForgotPassword(key, newPassword);
+
+    return {
+      message: "Password Successfully Changed",
     };
   }
 }
