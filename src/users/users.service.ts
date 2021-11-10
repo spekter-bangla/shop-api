@@ -1,10 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { FilterQuery, Model } from "mongoose";
-import { UpdateResult } from "mongodb";
+import { UpdateResult, DeleteResult } from "mongodb";
 
 import { CreateUserDto } from "./dto/create-user-dto";
 import { User } from "./user.model";
+import { addPagination } from "../utils/addPagination";
 
 @Injectable()
 export class UsersService {
@@ -28,6 +29,16 @@ export class UsersService {
     return result;
   }
 
+  async findAll(page: number, limit: number) {
+    const [data] = await this.userModel.aggregate([
+      { $match: { role: "user" } },
+      { $project: { password: 0 } },
+      ...addPagination(page, limit),
+    ]);
+
+    return data;
+  }
+
   async findById(id: string): Promise<User | null> {
     return this.userModel.findById(id);
   }
@@ -41,5 +52,15 @@ export class UsersService {
     updateData: Partial<User>,
   ): Promise<UpdateResult> {
     return this.userModel.updateOne(criteria, updateData);
+  }
+
+  async delete(id: string): Promise<DeleteResult> {
+    const user = await this.findById(id);
+
+    if (!user) {
+      throw new NotFoundException("User Not Found");
+    }
+
+    return this.userModel.deleteOne({ _id: id });
   }
 }

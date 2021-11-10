@@ -24,7 +24,7 @@ export const RolesGuard = (...roles: Role[]) => {
     canActivate(context: ExecutionContext): boolean {
       const req = context.switchToHttp().getRequest();
 
-      return roles.some((role) => req.user.role.toLowerCase() === role);
+      return roles.some((role) => req.user.role === role);
     }
   }
 

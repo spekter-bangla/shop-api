@@ -12,7 +12,7 @@ const UserSchema = new Schema(
     email: { type: String, unique: true, required: true },
     phone: { type: String, required: true },
     role: { type: String, enum: Role, default: Role.USER },
-    verified: { type: Boolean, required: true },
+    verified: { type: Boolean, required: true, default: false },
     address: { type: String },
     password: { type: String, required: true },
   },
