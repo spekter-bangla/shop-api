@@ -5,6 +5,9 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 
+import { RedisModule } from "./redis/redis.module";
+import { MailModule } from "./mail/mail.module";
+import { MailNotificationModule } from "./mail-notifications/mail-notifications.module";
 import { UsersModule } from "./users/users.module";
 import { AuthModule } from "./auth/auth.module";
 import { CategoriesModule } from "./categories/categories.module";
@@ -16,8 +19,11 @@ import { RatingsModule } from "./ratings/ratings.module";
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGO_URI!),
+    RedisModule,
+    MailModule,
+    MailNotificationModule,
     UsersModule,
     AuthModule,
     CategoriesModule,
