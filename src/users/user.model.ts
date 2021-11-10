@@ -12,6 +12,7 @@ const UserSchema = new Schema(
     email: { type: String, unique: true, required: true },
     phone: { type: String, required: true },
     role: { type: String, enum: Role, default: Role.USER },
+    verified: { type: Boolean, required: true },
     address: { type: String },
     password: { type: String, required: true },
   },
@@ -38,6 +39,7 @@ UserSchema.methods.validatePassword = function (password: string) {
 UserSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
+  delete obj.verified;
   return obj;
 };
 
@@ -48,6 +50,7 @@ export interface User extends Document {
   email: string;
   phone: string;
   role: Role;
+  verified: boolean;
   address: string;
   password: string;
   validatePassword(password: string): boolean;
