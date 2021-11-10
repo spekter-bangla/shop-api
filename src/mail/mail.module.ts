@@ -12,6 +12,7 @@ import { MailService } from "./mail.service";
     MailerModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
         transport: {
+          port: config.get("MAIL_PORT"),
           host: config.get("MAIL_HOST"),
           secure: config.get("MAIL_SECURE"),
           auth: {
