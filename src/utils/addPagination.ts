@@ -3,7 +3,7 @@ interface PageInfo {
   limit: number;
 }
 
-export interface PaginationResult<T> {
+export interface PaginatedResult<T> {
   result: T[];
   totalResult: number;
   totalPage: number;

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 
-import { addPagination, PaginationResult } from "../utils/addPagination";
+import { addPagination, PaginatedResult } from "../utils/addPagination";
 import { OrdersItemsService } from "../orders-items/orders-items.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { Order } from "./oder.model";
@@ -31,7 +31,7 @@ export class OrdersService {
     userId: string,
     page: number,
     limit: number,
-  ): Promise<PaginationResult<Order>> {
+  ): Promise<PaginatedResult<Order>> {
     const [result] = await this.orderModel.aggregate([
       {
         $match: { user: new Types.ObjectId(userId) },
