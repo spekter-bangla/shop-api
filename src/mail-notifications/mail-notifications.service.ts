@@ -5,6 +5,7 @@ import { DeleteResult } from "mongodb";
 
 import { MailNotification, Schedule } from "./mail-notification.model";
 import { MailService } from "../mail/mail.service";
+import { addPagination, PaginatedResult } from "../utils/addPagination";
 
 @Injectable()
 export class MailNotificationService {
@@ -94,8 +95,11 @@ export class MailNotificationService {
     return result;
   }
 
-  async getAll(): Promise<MailNotification[]> {
-    const result = await this.mailNotificationModel.aggregate([
+  async getAll(
+    page: number,
+    limit: number,
+  ): Promise<PaginatedResult<MailNotification>> {
+    const [result] = await this.mailNotificationModel.aggregate([
       {
         $lookup: {
           from: "users",
@@ -120,6 +124,8 @@ export class MailNotificationService {
           preserveNullAndEmptyArrays: true,
         },
       },
+      { $sort: { createdAt: -1 } },
+      ...addPagination(page, limit),
     ]);
 
     return result;
