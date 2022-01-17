@@ -16,6 +16,7 @@ import { OrdersItemsModule } from "./orders-items/orders-items.module";
 import { ProductsModule } from "./products/products.module";
 import { SubCategoriesModule } from "./sub-categories/sub-categories.module";
 import { RatingsModule } from "./ratings/ratings.module";
+import { CarouselModule } from "./carousels/carousels.module";
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { RatingsModule } from "./ratings/ratings.module";
     ProductsModule,
     SubCategoriesModule,
     RatingsModule,
+    CarouselModule,
   ],
   controllers: [AppController],
   providers: [AppService],

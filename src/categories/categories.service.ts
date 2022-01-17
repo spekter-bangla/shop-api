@@ -135,7 +135,7 @@ export class CategoriesService {
       throw new NotFoundException("Category Not Found");
     }
 
-    const result = this.categoryModel.deleteOne({ _id: id });
+    const result = await this.categoryModel.deleteOne({ _id: id });
 
     // remove image from cloudinary
     this.cloudinaryService.deleteImages(
