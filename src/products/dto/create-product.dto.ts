@@ -1,10 +1,4 @@
-import {
-  IsArray,
-  IsBoolean,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from "class-validator";
+import { IsArray, IsOptional, IsString } from "class-validator";
 
 export class CreateProductDto {
   @IsString()
@@ -34,7 +28,4 @@ export class CreateProductDto {
 
   @IsString()
   category: string;
-}
-function Isoptional() {
-  throw new Error("Function not implemented.");
 }
