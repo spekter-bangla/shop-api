@@ -8,8 +8,8 @@ export const ProductSchema = new Schema(
     unitPrice: { type: Number, required: true },
     totalStock: { type: Number, required: true },
     availableStock: { type: Number, required: true },
-    rating: { type: Number, required: true },
-    images: [{ type: String, required: true }],
+    rating: { type: Number, default: 0 },
+    images: [{ type: String }],
     category: {
       type: Schema.Types.ObjectId,
       ref: "SubCategory",
