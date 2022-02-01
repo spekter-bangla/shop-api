@@ -47,6 +47,10 @@ export class SubCategoriesService {
     return false;
   }
 
+  async isExists(id: string): Promise<boolean> {
+    return this.subCategoryModel.exists({ _id: id });
+  }
+
   async create(data: CreateSubCategoryDto): Promise<SubCategory> {
     const { name, description, status, image, category } = data;
 

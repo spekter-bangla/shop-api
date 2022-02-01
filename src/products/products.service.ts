@@ -78,6 +78,10 @@ export class ProductsService {
     return productResult;
   }
 
+  async insertMany(products): Promise<Product[]> {
+    return this.productModel.insertMany(products);
+  }
+
   async isProductExists(productId: string): Promise<boolean> {
     return this.productModel.exists({ _id: productId });
   }

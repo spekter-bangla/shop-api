@@ -1,4 +1,5 @@
 import { Express } from "express";
+import * as fs from "fs";
 import { Injectable } from "@nestjs/common";
 import { UploadApiErrorResponse, UploadApiResponse, v2 } from "cloudinary";
 import toStream = require("buffer-to-stream");
@@ -63,6 +64,36 @@ export class CloudinaryService {
         if (error) return reject(error);
         if (result) return resolve(result);
       });
+    });
+  }
+
+  async uploadRawFile(
+    folderName: string,
+    filePath: string,
+  ): Promise<UploadApiResponse | UploadApiErrorResponse> {
+    const folder = `Shop/${folderName}`;
+    return new Promise((resolve, reject) => {
+      v2.uploader.upload(
+        filePath,
+        {
+          folder,
+          quality: 50,
+          resource_type: "raw",
+        },
+        (error, result) => {
+          if (error) return reject(error);
+          if (result) {
+            fs.unlink(filePath, function (err) {
+              if (err) {
+                console.log(err);
+                return;
+              }
+              // console.log("File deleted!");
+            });
+            return resolve(result);
+          }
+        },
+      );
     });
   }
 }

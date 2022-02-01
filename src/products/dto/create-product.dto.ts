@@ -1,10 +1,4 @@
-import {
-  IsArray,
-  IsBoolean,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from "class-validator";
+import { IsArray, IsOptional, IsString } from "class-validator";
 
 export class CreateProductDto {
   @IsString()
@@ -25,16 +19,10 @@ export class CreateProductDto {
   @IsString()
   availableStock: number;
 
-  @IsString()
-  rating: number;
-
   @IsArray()
   @IsOptional()
   images: Array<any>;
 
   @IsString()
   category: string;
-}
-function Isoptional() {
-  throw new Error("Function not implemented.");
 }
