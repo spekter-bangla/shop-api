@@ -19,9 +19,6 @@ export class CreateProductDto {
   @IsString()
   availableStock: number;
 
-  @IsString()
-  rating: number;
-
   @IsArray()
   @IsOptional()
   images: Array<any>;

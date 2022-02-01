@@ -82,7 +82,7 @@ export class ProductsController {
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
     if (!files) {
-      throw new BadRequestException("Please provide category image");
+      throw new BadRequestException("Please provide product image");
     }
     const isValidCategory = await this.subCategoriesService.isExists(
       createProductDto.category,
@@ -92,7 +92,7 @@ export class ProductsController {
     }
 
     const fileUploadedResult = await this.cloudinaryService.uploadImages(
-      "Category",
+      "Product",
       files,
     );
 
