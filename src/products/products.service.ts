@@ -57,7 +57,6 @@ export class ProductsService {
       unitPrice,
       totalStock,
       availableStock,
-      rating,
       images,
       category,
     } = createProductDto;
@@ -69,7 +68,6 @@ export class ProductsService {
       unitPrice,
       totalStock,
       availableStock,
-      rating,
       images,
       category,
     });
