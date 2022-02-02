@@ -35,9 +35,9 @@ export class ProductsController {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  @Get("/")
-  async getAllProduct(@Query() query) {
-    const { category, page = 1, limit = 40 } = query;
+  @Post("/")
+  async getAllProduct(@Body() body) {
+    const { category, ...filter } = body;
 
     if (!category) {
       throw new BadRequestException("Please Provide a Category Id");
@@ -45,8 +45,7 @@ export class ProductsController {
 
     const allProducts = await this.productsService.findProductByCategory(
       category,
-      page,
-      limit,
+      filter,
     );
 
     return {

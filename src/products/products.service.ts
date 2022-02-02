@@ -18,7 +18,26 @@ export class ProductsService {
     return this.productModel.find();
   }
 
-  async findProductByCategory(categoryId: string, page: number, limit: number) {
+  async findProductByCategory(categoryId: string, filter: any) {
+    const { page = 1, limit = 40, sort = ["new"] } = filter;
+    let sortFilter: any = {};
+    for (let i = 0; i < sort.length; i++) {
+      const sortCond = sort[i];
+      if (sortCond === "new") {
+        sortFilter.createdAt = -1;
+      } else if (sortCond === "old") {
+        sortFilter.createdAt = 1;
+      } else if (sortCond === "rating_high") {
+        sortFilter.rating = -1;
+      } else if (sortCond === "rating_low") {
+        sortFilter.rating = 1;
+      } else if (sortCond === "price_high") {
+        sortFilter.unitPrice = -1;
+      } else if (sortCond === "price_low") {
+        sortFilter.unitPrice = 1;
+      }
+    }
+
     let catIds = [new Types.ObjectId(categoryId)];
     const categoryDoc: any = await this.categoriesService.findById(categoryId);
 
@@ -31,6 +50,7 @@ export class ProductsService {
 
     const [data] = await this.productModel.aggregate([
       { $match: { category: { $in: catIds } } },
+      { $sort: sortFilter },
       ...addPagination(page, limit),
     ]);
 
