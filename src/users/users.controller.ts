@@ -51,6 +51,17 @@ export class UsersController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get("/singleUser/:id")
+  async getSingleUser(@Param("id") id: string) {
+    console.log(id);
+    const user = await this.usersService.findById(id);
+    return {
+      status: "Success",
+      data: user,
+    };
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuard(Role.ADMIN))
   @Delete("/delete/:id")
   async deleteUser(
