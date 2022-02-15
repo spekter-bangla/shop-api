@@ -4,6 +4,7 @@ import { Model, Types } from "mongoose";
 
 import { addPagination, PaginatedResult } from "../utils/addPagination";
 import { OrdersItemsService } from "../orders-items/orders-items.service";
+import { ProductsService } from "../products/products.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { Order } from "./oder.model";
 
@@ -12,6 +13,7 @@ export class OrdersService {
   constructor(
     @InjectModel("Order") private readonly orderModel: Model<Order>,
     private readonly orderItemsService: OrdersItemsService,
+    private readonly productsService: ProductsService,
   ) {}
 
   async createOrder(data: CreateOrderDto, userId: string): Promise<Order> {
@@ -23,7 +25,10 @@ export class OrdersService {
       orderItems: orderItemIds,
     });
 
+    // update product stock
+    await this.productsService.updateProductStock(data.orderItems);
     await order.save();
+
     return order;
   }
 

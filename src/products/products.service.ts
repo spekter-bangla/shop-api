@@ -115,4 +115,25 @@ export class ProductsService {
   async updateProductRating(productId: string, rating: number): Promise<void> {
     await this.productModel.findByIdAndUpdate(productId, { rating });
   }
+
+  async getProductAvailableStock(
+    productIds: string[],
+  ): Promise<{ _id: any; availableStock: number }[]> {
+    return this.productModel
+      .find({ _id: { $in: productIds } })
+      .select("availableStock");
+  }
+
+  async updateProductStock(data: { product: string; quantity: number }[]) {
+    const queryPromise: any = [];
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+      const query = this.productModel.findByIdAndUpdate(item.product, {
+        $inc: { availableStock: Number(`-${item.quantity}`) },
+      });
+      queryPromise.push(query);
+    }
+
+    await Promise.all(queryPromise);
+  }
 }

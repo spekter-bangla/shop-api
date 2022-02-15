@@ -17,14 +17,8 @@ class OrderItem {
 }
 
 export class CreateOrderDto {
-  @IsString()
-  user: string;
-
   @ValidateNested({ each: true })
   @IsNotEmpty()
   @Type(() => OrderItem)
   orderItems: OrderItem[];
-
-  @IsString()
-  status: OrderStatus;
 }
