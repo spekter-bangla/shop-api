@@ -173,6 +173,7 @@ export class OrdersService {
           },
         },
       },
+      { $sort: { createdAt: -1 } },
       ...addPagination(page, limit),
     ]);
 
