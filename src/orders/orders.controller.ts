@@ -8,7 +8,10 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
+
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { Role } from "../users/user.model";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { OrdersService } from "./orders.service";
 
@@ -17,17 +20,29 @@ import { OrdersService } from "./orders.service";
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @Get("/")
+  @Get("/me")
   async getAllMyOrders(@Req() req, @Query() query) {
     const { page = 1, limit = 40 } = query;
 
-    const allOrders = await this.ordersService.findAllMyOrders(
-      req.user._id,
+    const allOrders = await this.ordersService.findAllOrders(
       page,
       limit,
+      req.user._id,
     );
+
     return {
-      status: "Success",
+      data: allOrders,
+    };
+  }
+
+  @UseGuards(RolesGuard(Role.ADMIN))
+  @Get("/")
+  async getAllOrders(@Query() query) {
+    const { page = 1, limit = 40 } = query;
+
+    const allOrders = await this.ordersService.findAllOrders(page, limit);
+
+    return {
       data: allOrders,
     };
   }
