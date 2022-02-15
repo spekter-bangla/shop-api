@@ -18,9 +18,11 @@ export class ProductsService {
     return this.productModel.find();
   }
 
-  async findProductByCategory(categoryId: string, filter: any) {
+  async findProductByCategory(filter: any, categoryId?: string) {
     const { page = 1, limit = 40, sort = ["new"] } = filter;
+    let productFilter: any[] = [];
     let sortFilter: any = {};
+
     for (let i = 0; i < sort.length; i++) {
       const sortCond = sort[i];
       if (sortCond === "new") {
@@ -38,18 +40,24 @@ export class ProductsService {
       }
     }
 
-    let catIds = [new Types.ObjectId(categoryId)];
-    const categoryDoc: any = await this.categoriesService.findById(categoryId);
+    if (categoryId) {
+      let catIds = [new Types.ObjectId(categoryId)];
+      const categoryDoc: any = await this.categoriesService.findById(
+        categoryId,
+      );
 
-    if (categoryDoc) {
-      catIds = categoryDoc.subCategories.reduce((acc, { _id }) => {
-        acc.push(new Types.ObjectId(_id));
-        return acc;
-      }, []);
+      if (categoryDoc) {
+        catIds = categoryDoc.subCategories.reduce((acc, { _id }) => {
+          acc.push(new Types.ObjectId(_id));
+          return acc;
+        }, []);
+      }
+
+      productFilter.push({ $match: { category: { $in: catIds } } });
     }
 
     const [data] = await this.productModel.aggregate([
-      { $match: { category: { $in: catIds } } },
+      ...productFilter,
       { $sort: sortFilter },
       ...addPagination(page, limit),
     ]);
