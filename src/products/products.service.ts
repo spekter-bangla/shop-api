@@ -18,9 +18,11 @@ export class ProductsService {
     return this.productModel.find();
   }
 
-  async findProductByCategory(categoryId: string, filter: any) {
+  async findProductByCategory(filter: any, categoryId?: string) {
     const { page = 1, limit = 40, sort = ["new"] } = filter;
+    let productFilter: any[] = [];
     let sortFilter: any = {};
+
     for (let i = 0; i < sort.length; i++) {
       const sortCond = sort[i];
       if (sortCond === "new") {
@@ -38,18 +40,24 @@ export class ProductsService {
       }
     }
 
-    let catIds = [new Types.ObjectId(categoryId)];
-    const categoryDoc: any = await this.categoriesService.findById(categoryId);
+    if (categoryId) {
+      let catIds = [new Types.ObjectId(categoryId)];
+      const categoryDoc: any = await this.categoriesService.findById(
+        categoryId,
+      );
 
-    if (categoryDoc) {
-      catIds = categoryDoc.subCategories.reduce((acc, { _id }) => {
-        acc.push(new Types.ObjectId(_id));
-        return acc;
-      }, []);
+      if (categoryDoc) {
+        catIds = categoryDoc.subCategories.reduce((acc, { _id }) => {
+          acc.push(new Types.ObjectId(_id));
+          return acc;
+        }, []);
+      }
+
+      productFilter.push({ $match: { category: { $in: catIds } } });
     }
 
     const [data] = await this.productModel.aggregate([
-      { $match: { category: { $in: catIds } } },
+      ...productFilter,
       { $sort: sortFilter },
       ...addPagination(page, limit),
     ]);
@@ -106,5 +114,26 @@ export class ProductsService {
 
   async updateProductRating(productId: string, rating: number): Promise<void> {
     await this.productModel.findByIdAndUpdate(productId, { rating });
+  }
+
+  async getProductAvailableStock(
+    productIds: string[],
+  ): Promise<{ _id: any; availableStock: number }[]> {
+    return this.productModel
+      .find({ _id: { $in: productIds } })
+      .select("availableStock");
+  }
+
+  async updateProductStock(data: { product: string; quantity: number }[]) {
+    const queryPromise: any = [];
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+      const query = this.productModel.findByIdAndUpdate(item.product, {
+        $inc: { availableStock: Number(`-${item.quantity}`) },
+      });
+      queryPromise.push(query);
+    }
+
+    await Promise.all(queryPromise);
   }
 }

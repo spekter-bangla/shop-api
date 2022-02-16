@@ -6,13 +6,18 @@ export enum OrderStatus {
   DONE = "DONE",
 }
 
-export const OrderSchema = new Schema({
-  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  orderItems: [
-    { type: Schema.Types.ObjectId, ref: "OrderItem", required: true },
-  ],
-  status: { type: String, enum: OrderStatus, default: OrderStatus.OPEN },
-});
+export const OrderSchema = new Schema(
+  {
+    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    orderItems: [
+      { type: Schema.Types.ObjectId, ref: "OrderItem", required: true },
+    ],
+    status: { type: String, enum: OrderStatus, default: OrderStatus.OPEN },
+  },
+  {
+    timestamps: true,
+  },
+);
 
 export interface Order extends Document {
   user: string;

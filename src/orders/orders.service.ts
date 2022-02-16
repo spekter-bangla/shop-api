@@ -4,6 +4,7 @@ import { Model, Types } from "mongoose";
 
 import { addPagination, PaginatedResult } from "../utils/addPagination";
 import { OrdersItemsService } from "../orders-items/orders-items.service";
+import { ProductsService } from "../products/products.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { Order } from "./oder.model";
 
@@ -12,6 +13,7 @@ export class OrdersService {
   constructor(
     @InjectModel("Order") private readonly orderModel: Model<Order>,
     private readonly orderItemsService: OrdersItemsService,
+    private readonly productsService: ProductsService,
   ) {}
 
   async createOrder(data: CreateOrderDto, userId: string): Promise<Order> {
@@ -23,18 +25,55 @@ export class OrdersService {
       orderItems: orderItemIds,
     });
 
+    // update product stock
+    await this.productsService.updateProductStock(data.orderItems);
     await order.save();
+
     return order;
   }
 
-  async findAllMyOrders(
-    userId: string,
+  async findAllOrders(
     page: number,
     limit: number,
+    userId?: string,
   ): Promise<PaginatedResult<Order>> {
-    const [result] = await this.orderModel.aggregate([
-      {
+    const filter: any[] = [];
+
+    if (userId) {
+      filter.push({
         $match: { user: new Types.ObjectId(userId) },
+      });
+    }
+    const [result] = await this.orderModel.aggregate([
+      ...filter,
+      {
+        $lookup: {
+          from: "users",
+          let: {
+            thisDocKey: "$user",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$_id", "$$thisDocKey"],
+                },
+              },
+            },
+            {
+              $project: {
+                password: 0,
+              },
+            },
+          ],
+          as: "user",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $unwind: {
@@ -120,6 +159,9 @@ export class OrdersService {
           orderItems: {
             $push: "$orderItems",
           },
+          user: {
+            $first: "$user",
+          },
           status: {
             $first: "$status",
           },
@@ -131,6 +173,7 @@ export class OrdersService {
           },
         },
       },
+      { $sort: { createdAt: -1 } },
       ...addPagination(page, limit),
     ]);
 
