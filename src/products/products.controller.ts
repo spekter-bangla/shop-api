@@ -39,13 +39,9 @@ export class ProductsController {
   async getAllProduct(@Body() body) {
     const { category, ...filter } = body;
 
-    if (!category) {
-      throw new BadRequestException("Please Provide a Category Id");
-    }
-
     const allProducts = await this.productsService.findProductByCategory(
-      category,
       filter,
+      category,
     );
 
     return {
