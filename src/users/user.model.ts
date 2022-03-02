@@ -15,6 +15,7 @@ const UserSchema = new Schema(
     verified: { type: Boolean, required: true, default: false },
     address: { type: String },
     password: { type: String, required: true },
+    image: { type: String },
   },
   {
     timestamps: true,

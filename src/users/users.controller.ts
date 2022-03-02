@@ -5,10 +5,14 @@ import {
   Get,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Query,
+  Req,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
 import { DeleteResult } from "mongodb";
 
@@ -18,6 +22,8 @@ import { ResponseBody } from "../utils/ResponseBody";
 import { Role, User } from "./user.model";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
+import { SingleImageUploadInterceptor } from "../interceptors/SingleImageUploadInterceptor";
+import { UpdateUserDto } from "./dto/update-user-dto";
 
 @Controller("users")
 export class UsersController {
@@ -60,6 +66,19 @@ export class UsersController {
       status: "Success",
       data: user,
     };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch("/singleUserUpdate")
+  @UseInterceptors(SingleImageUploadInterceptor(3 * 1024 * 1024))
+  async updateSingleUser(
+    @Req() req,
+    @Body() body: UpdateUserDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    console.log(req.user._id);
+    console.log(body.name);
+    console.log(file);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard(Role.ADMIN))
