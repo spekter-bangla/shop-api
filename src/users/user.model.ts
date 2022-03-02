@@ -15,6 +15,7 @@ const UserSchema = new Schema(
     verified: { type: Boolean, required: true, default: false },
     address: { type: String },
     password: { type: String, required: true },
+    image: { type: String },
   },
   {
     timestamps: true,
@@ -53,5 +54,6 @@ export interface User extends Document {
   verified: boolean;
   address: string;
   password: string;
+  image: string;
   validatePassword(password: string): boolean;
 }

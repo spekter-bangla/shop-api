@@ -3,13 +3,18 @@ import { InjectModel } from "@nestjs/mongoose";
 import { FilterQuery, Model } from "mongoose";
 import { UpdateResult, DeleteResult } from "mongodb";
 
+import { CloudinaryService } from "../cloudinary/cloudinary.service";
 import { CreateUserDto } from "./dto/create-user-dto";
 import { User } from "./user.model";
 import { addPagination } from "../utils/addPagination";
+import { getPublicIdsFromImageUrl } from "../utils/getPublicIdsFromImageUrl";
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel("User") private readonly userModel: Model<User>) {}
+  constructor(
+    @InjectModel("User") private readonly userModel: Model<User>,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   async doesUserExists(createUserDto: CreateUserDto): Promise<boolean> {
     const user = await this.userModel.findOne({ email: createUserDto.email });
@@ -52,6 +57,30 @@ export class UsersService {
     updateData: Partial<User>,
   ): Promise<UpdateResult> {
     return this.userModel.updateOne(criteria, updateData);
+  }
+
+  async update(user: User, dataToUpdate: Partial<User>): Promise<User> {
+    // const user = await this.findById(id);
+
+    // if (!user) {
+    //   throw new NotFoundException("User Not Found");
+    // }
+    let previousImage: string = "";
+    if (user.image) {
+      previousImage = user.image;
+    }
+
+    user.set(dataToUpdate);
+    const result = await user.save();
+
+    // delete previous image
+    if (dataToUpdate.image && previousImage) {
+      this.cloudinaryService.deleteImages(
+        getPublicIdsFromImageUrl(previousImage),
+      );
+    }
+
+    return result;
   }
 
   async delete(id: string): Promise<DeleteResult> {
