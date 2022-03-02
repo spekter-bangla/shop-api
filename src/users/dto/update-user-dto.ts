@@ -15,21 +15,9 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
-  role: string;
-
-  @IsOptional()
-  @IsBoolean()
-  verified: boolean;
-
-  @IsOptional()
-  @IsString()
   address: string;
 
   @IsOptional()
   @IsString()
   password: string;
-
-  @IsOptional()
-  @IsString()
-  image: string;
 }

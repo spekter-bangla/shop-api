@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -17,6 +18,7 @@ import {
 import { DeleteResult } from "mongodb";
 
 import { UsersService } from "./users.service";
+import { CloudinaryService } from "../cloudinary/cloudinary.service";
 import { CreateUserDto } from "./dto/create-user-dto";
 import { ResponseBody } from "../utils/ResponseBody";
 import { Role, User } from "./user.model";
@@ -27,7 +29,10 @@ import { UpdateUserDto } from "./dto/update-user-dto";
 
 @Controller("users")
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @Post("/create")
   async createUser(@Res() res, @Body() createUserDto: CreateUserDto) {
@@ -76,9 +81,37 @@ export class UsersController {
     @Body() body: UpdateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    console.log(req.user._id);
-    console.log(body.name);
-    console.log(file);
+    const dataToUpdate: any = {};
+
+    if (body.name) {
+      dataToUpdate.name = body.name;
+    }
+    if (body.email) {
+      dataToUpdate.email = body.email;
+    }
+    if (body.phone) {
+      dataToUpdate.phone = body.phone;
+    }
+    if (body.address) {
+      dataToUpdate.address = body.address;
+    }
+    if (body.password) {
+      dataToUpdate.password = body.password;
+    }
+    if (file) {
+      const fileUploadedResult = await this.cloudinaryService.uploadImage(
+        "User",
+        file,
+      );
+      dataToUpdate.image = fileUploadedResult.url;
+    }
+
+    const user = await this.usersService.update(req.user, dataToUpdate);
+
+    return {
+      message: "User Updated Successfully",
+      data: user,
+    };
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard(Role.ADMIN))
