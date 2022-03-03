@@ -9,6 +9,7 @@ import {
   Query,
   Res,
   UseGuards,
+  Request,
 } from "@nestjs/common";
 import { DeleteResult } from "mongodb";
 
@@ -36,6 +37,12 @@ export class UsersController {
       message: "User has been created successfully",
       user,
     });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("/me")
+  async me(@Request() req) {
+    return req.user;
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard(Role.ADMIN))
