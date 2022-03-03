@@ -21,7 +21,21 @@ import { CarouselModule } from "./carousels/carousels.module";
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRoot(process.env.MONGO_URI!),
+    MongooseModule.forRoot(process.env.MONGO_URI!, {
+      connectionFactory: (connection) => {
+        connection.on("connected", () => {
+          console.log(`MongoDB connected with database: ${connection.name}`);
+        });
+        connection.on("disconnected", () => {
+          console.log("MongoDB disconnected");
+        });
+        connection.on("error", (error) => {
+          console.log("MongoDB connection failed! for error: ", error);
+        });
+
+        return connection;
+      },
+    }),
     RedisModule,
     MailModule,
     MailNotificationModule,
