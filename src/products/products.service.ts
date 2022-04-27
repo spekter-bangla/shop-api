@@ -118,10 +118,10 @@ export class ProductsService {
 
   async getProductAvailableStock(
     productIds: string[],
-  ): Promise<{ _id: any; availableStock: number }[]> {
+  ): Promise<{ _id: any; availableStock: number; unitPrice: number }[]> {
     return this.productModel
       .find({ _id: { $in: productIds } })
-      .select("availableStock");
+      .select("availableStock unitPrice");
   }
 
   async updateProductStock(data: { product: string; quantity: number }[]) {
