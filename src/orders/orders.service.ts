@@ -17,12 +17,13 @@ export class OrdersService {
   ) {}
 
   async createOrder(data: CreateOrderDto, userId: string): Promise<Order> {
-    const orderItemIds = await this.orderItemsService.createOrderItem(
-      data.orderItems,
-    );
+    const { orderItemIds, totalPrice } =
+      await this.orderItemsService.createOrderItem(data.orderItems);
+
     const order: Order = new this.orderModel({
       user: userId,
       orderItems: orderItemIds,
+      totalPrice,
     });
 
     // update product stock
@@ -158,6 +159,9 @@ export class OrdersService {
           _id: "$_id",
           orderItems: {
             $push: "$orderItems",
+          },
+          totalPrice: {
+            $first: "$totalPrice",
           },
           user: {
             $first: "$user",

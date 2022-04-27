@@ -12,6 +12,7 @@ export const OrderSchema = new Schema(
     orderItems: [
       { type: Schema.Types.ObjectId, ref: "OrderItem", required: true },
     ],
+    totalPrice: { type: Number, required: true },
     status: { type: String, enum: OrderStatus, default: OrderStatus.OPEN },
   },
   {
@@ -22,5 +23,6 @@ export const OrderSchema = new Schema(
 export interface Order extends Document {
   user: string;
   orderItems: string[];
+  totalPrice: number;
   status: OrderStatus;
 }

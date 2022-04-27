@@ -37,9 +37,7 @@ export class OrdersItemsService {
     return orderItem;
   }
 
-  async createOrderItem(
-    createOrderItemDtos: CreateOrderItemDto[],
-  ): Promise<any> {
+  async createOrderItem(createOrderItemDtos: CreateOrderItemDto[]) {
     const productIds = createOrderItemDtos.map((item) => item.product);
     const stock = await this.productsService.getProductAvailableStock(
       productIds,
@@ -48,12 +46,18 @@ export class OrdersItemsService {
       acc[curr._id] = curr.availableStock;
       return acc;
     }, {});
+    const unitPriceData = stock.reduce((acc, curr) => {
+      acc[curr._id] = curr.unitPrice;
+      return acc;
+    }, {});
 
     const errorMessage: any = {};
+    let totalPrice = 0;
 
     for (let i = 0; i < createOrderItemDtos.length; i++) {
       const item = createOrderItemDtos[i];
       if (stockData[item.product]) {
+        totalPrice = totalPrice + item.quantity * unitPriceData[item.product];
         if (stockData[item.product] < item.quantity) {
           errorMessage[item.product] = `Only ${
             stockData[item.product]
@@ -78,6 +82,6 @@ export class OrdersItemsService {
       return acc;
     }, []);
 
-    return orderItemIds;
+    return { orderItemIds, totalPrice };
   }
 }

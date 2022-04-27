@@ -30,16 +30,6 @@ export class OrdersController {
       req.user._id,
     );
 
-    allOrders.result.forEach((order: any) => {
-      order.totalPrice = order.orderItems.reduce(
-        (sum, { quantity, product: { unitPrice } }) => {
-          sum = sum + quantity * unitPrice;
-          return sum;
-        },
-        0,
-      );
-    });
-
     return {
       data: allOrders,
     };
@@ -67,7 +57,7 @@ export class OrdersController {
   }
 
   @Post("/create")
-  async createOrderItem(@Req() req, @Body() data: CreateOrderDto) {
+  async createOrder(@Req() req, @Body() data: CreateOrderDto) {
     return this.ordersService.createOrder(data, req.user._id);
   }
 }
