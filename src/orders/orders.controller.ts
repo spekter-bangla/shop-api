@@ -22,11 +22,12 @@ export class OrdersController {
 
   @Get("/me")
   async getAllMyOrders(@Req() req, @Query() query) {
-    const { page = 1, limit = 40 } = query;
+    const { page = 1, limit = 40, status } = query;
 
     const allOrders = await this.ordersService.findAllOrders(
       page,
       limit,
+      status,
       req.user._id,
     );
 
@@ -38,9 +39,13 @@ export class OrdersController {
   @UseGuards(RolesGuard(Role.ADMIN))
   @Get("/")
   async getAllOrders(@Query() query) {
-    const { page = 1, limit = 40 } = query;
+    const { page = 1, limit = 40, status } = query;
 
-    const allOrders = await this.ordersService.findAllOrders(page, limit);
+    const allOrders = await this.ordersService.findAllOrders(
+      page,
+      limit,
+      status,
+    );
 
     return {
       data: allOrders,

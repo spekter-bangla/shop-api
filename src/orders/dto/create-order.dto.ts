@@ -6,7 +6,6 @@ import {
   IsString,
   ValidateNested,
 } from "class-validator";
-import { OrderStatus } from "../oder.model";
 
 class OrderItem {
   @IsNumber()

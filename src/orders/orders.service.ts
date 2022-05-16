@@ -36,15 +36,22 @@ export class OrdersService {
   async findAllOrders(
     page: number,
     limit: number,
+    status: string,
     userId?: string,
   ): Promise<PaginatedResult<Order>> {
-    const filter: any[] = [];
+    const filter: any[] = [
+      {
+        $match: {},
+      },
+    ];
 
     if (userId) {
-      filter.push({
-        $match: { user: new Types.ObjectId(userId) },
-      });
+      filter[0].$match["user"] = new Types.ObjectId(userId);
     }
+    if (status) {
+      filter[0].$match["status"] = status;
+    }
+
     const [result] = await this.orderModel.aggregate([
       ...filter,
       {
