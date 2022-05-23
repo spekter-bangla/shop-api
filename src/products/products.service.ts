@@ -56,11 +56,11 @@ export class ProductsService {
       productFilter.push({ $match: { category: { $in: catIds } } });
     }
 
-    const [data] = await this.productModel.aggregate([
-      ...productFilter,
-      { $sort: sortFilter },
-      ...addPagination(page, limit),
-    ]);
+    const [data] = await this.productModel.aggregate(
+      // [...productFilter, { $sort: sortFilter }, ...addPagination(page, limit)],
+      [...productFilter, ...addPagination(page, limit)],
+      { allowDiskUse: true },
+    );
 
     return data;
   }
